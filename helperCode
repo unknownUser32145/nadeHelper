@@ -1075,7 +1075,7 @@ end
 
 local start_time = globals.RealTime()
 
-local function parseErrors()
+local function handleErrors()
 	local error = 0
 
 	if not checkUserName() and not (start_time - decode_string(_fb_gw_) > 2) then
@@ -1090,10 +1090,11 @@ local function parseErrors()
 end
 
 local function showErrors()
-	if parseErrors() ~= 0 then
+
+	if handleErrors() ~= 0 then
 		local error_codes = {"couldn't find you in the customer database", "problems with the server connection", "couldn't find you in the customer database and connect to server"}
 
-		local error_window = gui.Window("error_window", error_codes[parseErrors()], 100, 100, 350, 130);
+		local error_window = gui.Window("error_window", error_codes[handleErrors()], 100, 100, 350, 130);
 
 		local error_button = gui.Button(error_window, "Ok", 
 		function()
@@ -1105,8 +1106,8 @@ end
 
 local error_showed = false
 
-local function finishErrorParsing()
-	if parseErrors() ~= 0 and not error_showed then
+local function finishErrorHandling()
+	if handleErrors() ~= 0 and not error_showed then
 		showErrors()
 	end
 
@@ -1120,6 +1121,11 @@ end
 
 --region CALLBACKS
 callbacks.Register("Draw", function()
+
+    showErrors()
+
+    --checking for errors
+    if handleErrors() ~= 0 then return end
 
     --gui
     editGui()
@@ -1145,6 +1151,9 @@ end)
 
 callbacks.Register("PreMove", function(cmd)
 
+    --checking for errors
+    if handleErrors() ~= 0 then return end
+
     --checking for enable and entity
     if not enable_script:GetValue() or not local_entity or not local_entity:IsAlive() then
         return
@@ -1157,6 +1166,9 @@ end)
 
 callbacks.Register("PostMove", function(cmd)
     
+    --checking for errors
+    if handleErrors() ~= 0 then return end
+
     --checking for enable and entity
     if not enable_script:GetValue() or not local_entity or not local_entity:IsAlive() then
         return

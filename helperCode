@@ -1122,7 +1122,7 @@ end
 --region CALLBACKS
 callbacks.Register("Draw", function()
 
-    showErrors()
+    finishErrorHandling()
 
     --checking for errors
     if handleErrors() ~= 0 then return end
